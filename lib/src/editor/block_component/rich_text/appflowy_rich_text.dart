@@ -424,6 +424,12 @@ class _AppFlowyRichTextState extends State<AppFlowyRichText>
             textStyleConfiguration.applyHeightToLastDescent,
         leadingDistribution: textStyleConfiguration.leadingDistribution,
       ),
+      strutStyle: StrutStyle.fromTextStyle(
+        textStyleConfiguration.text.copyWith(
+          height: textStyleConfiguration.lineHeight,
+        ),
+        forceStrutHeight: true,
+      ),
       text: textSpan,
       textDirection: textDirection(),
       textScaler: TextScaler.linear(
@@ -462,6 +468,12 @@ class _AppFlowyRichTextState extends State<AppFlowyRichText>
         applyHeightToLastDescent:
             textStyleConfiguration.applyHeightToLastDescent,
         leadingDistribution: textStyleConfiguration.leadingDistribution,
+      ),
+      strutStyle: StrutStyle.fromTextStyle(
+        textStyleConfiguration.text.copyWith(
+          height: textStyleConfiguration.lineHeight,
+        ),
+        forceStrutHeight: true,
       ),
       text: textSpan,
       textDirection: textDirection(),
@@ -537,6 +549,12 @@ class _AppFlowyRichTextState extends State<AppFlowyRichText>
             applyHeightToLastDescent:
                 textStyleConfiguration.applyHeightToLastDescent,
             leadingDistribution: textStyleConfiguration.leadingDistribution,
+          ),
+          strutStyle: StrutStyle.fromTextStyle(
+            textStyleConfiguration.text.copyWith(
+              height: textStyleConfiguration.lineHeight,
+            ),
+            forceStrutHeight: true,
           ),
           text: textSpan,
           textDirection: textDirection(),
