@@ -175,8 +175,11 @@ extension PositionExtension on Position {
     // vertical padding.
     final globalVerticalPadding = editorState.editorStyle.padding.vertical;
 
+    // flutter 规定，左上两边属于一个 rect，右下两边不属于 rect
+    // 这样算出的位置，flutter 不会认为落在前一个 block 内部
+    // 我们需要给 offset 加上一个像素，确保落在前一个段落的“内部”
     final maxSkip = upwards
-        ? padding.top + globalVerticalPadding
+        ? padding.top + globalVerticalPadding + 1
         : padding.bottom + globalVerticalPadding;
 
     // Translate the new offset by the padding slice to skip.
