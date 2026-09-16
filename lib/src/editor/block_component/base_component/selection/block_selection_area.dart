@@ -132,7 +132,7 @@ class _BlockSelectionAreaState extends State<BlockSelectionArea> {
               prevCursorRect == null) {
             return sizedBox;
           }
-          final editorState = context.read<EditorState>();
+          // final editorState = context.read<EditorState>();
           final dragMode =
               editorState.selectionExtraInfo?[selectionDragModeKey];
           final shouldBlink = widget.delegate.shouldCursorBlink &&
@@ -149,6 +149,26 @@ class _BlockSelectionAreaState extends State<BlockSelectionArea> {
 
           return cursor;
         } else {
+          // Keep the caret visible while there is a non-collapsed selection.
+          if (widget.supportTypes.contains(BlockSelectionType.cursor) &&
+              prevCursorRect != null) {
+            final dragMode =
+                editorState.selectionExtraInfo?[selectionDragModeKey];
+            final shouldBlink = widget.delegate.shouldCursorBlink &&
+                dragMode != MobileSelectionDragMode.cursor;
+            final cursor = Cursor(
+              key: cursorKey,
+              rect: prevCursorRect!,
+              shouldBlink: shouldBlink,
+              cursorStyle: widget.delegate.cursorStyle,
+              color: widget.cursorColor,
+            );
+            // force to show the cursor
+            cursorKey.currentState?.unwrapOrNull<CursorState>()?.show();
+
+            return cursor;
+          }
+
           // show the selection area when the selection is not collapsed
           if (!widget.supportTypes.contains(BlockSelectionType.selection) ||
               prevSelectionRects == null ||
@@ -180,7 +200,8 @@ class _BlockSelectionAreaState extends State<BlockSelectionArea> {
       return;
     }
 
-    final selection = widget.listenable.value?.normalized;
+    final rawSelection = widget.listenable.value;
+    final selection = rawSelection?.normalized;
     final path = widget.node.path;
 
     // the current path is in the selection
@@ -205,9 +226,18 @@ class _BlockSelectionAreaState extends State<BlockSelectionArea> {
             });
           }
         }
-      } else if (widget.supportTypes.contains(BlockSelectionType.cursor) &&
-          selection.isCollapsed) {
-        final rect = widget.delegate.getCursorRectInPosition(selection.start);
+      } else if (widget.supportTypes.contains(BlockSelectionType.cursor)) {
+        // Show the caret at the active end of the selection even when the
+        // selection is not collapsed.
+        Position? cursorPosition;
+        if (selection.isCollapsed) {
+          cursorPosition = selection.start;
+        } else if (rawSelection != null && path.equals(rawSelection.end.path)) {
+          cursorPosition = rawSelection.end;
+        }
+        final rect = cursorPosition == null
+            ? null
+            : widget.delegate.getCursorRectInPosition(cursorPosition);
         if (rect != prevCursorRect) {
           setState(() {
             prevCursorRect = rect;
@@ -240,7 +270,25 @@ class _BlockSelectionAreaState extends State<BlockSelectionArea> {
     });
   }
 
+  // 拖动过程中，保持 cursor 一直显示，因此不能无脑清空 prevCursorRect
   void _clearCursorRect() {
+    final rawSelection = widget.listenable.value;
+    final selection = rawSelection?.normalized;
+    if (selection == null) {
+      prevCursorRect = null;
+      return;
+    }
+    if (!widget.supportTypes.contains(BlockSelectionType.cursor)) {
+      prevCursorRect = null;
+      return;
+    }
+    // Keep the current caret rect during a non-collapsed selection in this
+    // block so the caret does not blink out on every selection update.
+    if (!selection.isCollapsed &&
+        rawSelection != null &&
+        widget.node.path.equals(rawSelection.end.path)) {
+      return;
+    }
     prevCursorRect = null;
   }
 }
