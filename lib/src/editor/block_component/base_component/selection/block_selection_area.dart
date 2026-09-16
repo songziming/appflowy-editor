@@ -125,14 +125,9 @@ class _BlockSelectionAreaState extends State<BlockSelectionArea> {
               ),
             ),
           );
-        }
-        // show the cursor when the selection is collapsed
-        else if (selection.isCollapsed) {
-          if (!widget.supportTypes.contains(BlockSelectionType.cursor) ||
-              prevCursorRect == null) {
-            return sizedBox;
-          }
-          // final editorState = context.read<EditorState>();
+        } else if (widget.supportTypes.contains(BlockSelectionType.cursor) &&
+            prevCursorRect != null) {
+          // 不管选区是否 collapse，都要绘制 cursor
           final dragMode =
               editorState.selectionExtraInfo?[selectionDragModeKey];
           final shouldBlink = widget.delegate.shouldCursorBlink &&
@@ -146,29 +141,11 @@ class _BlockSelectionAreaState extends State<BlockSelectionArea> {
           );
           // force to show the cursor
           cursorKey.currentState?.unwrapOrNull<CursorState>()?.show();
-
           return cursor;
+        } else if (selection.isCollapsed) {
+          // type==selection，当前没有选取，返回空
+          return sizedBox;
         } else {
-          // Keep the caret visible while there is a non-collapsed selection.
-          if (widget.supportTypes.contains(BlockSelectionType.cursor) &&
-              prevCursorRect != null) {
-            final dragMode =
-                editorState.selectionExtraInfo?[selectionDragModeKey];
-            final shouldBlink = widget.delegate.shouldCursorBlink &&
-                dragMode != MobileSelectionDragMode.cursor;
-            final cursor = Cursor(
-              key: cursorKey,
-              rect: prevCursorRect!,
-              shouldBlink: shouldBlink,
-              cursorStyle: widget.delegate.cursorStyle,
-              color: widget.cursorColor,
-            );
-            // force to show the cursor
-            cursorKey.currentState?.unwrapOrNull<CursorState>()?.show();
-
-            return cursor;
-          }
-
           // show the selection area when the selection is not collapsed
           if (!widget.supportTypes.contains(BlockSelectionType.selection) ||
               prevSelectionRects == null ||
