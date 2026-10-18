@@ -149,16 +149,20 @@ class _AppFlowyRichTextState extends State<AppFlowyRichText>
       widget.editorState.editorStyle.textSpanBackgroundBuilder;
 
   // 固定行高，其他样式保持不变
-  StrutStyle _createStrutStyle(TextSpan textSpan) {
+  StrutStyle? _createStrutStyle(TextSpan textSpan) {
     final fallback = textStyleConfiguration.text.copyWith(
       height: textStyleConfiguration.lineHeight,
     );
 
     final textStyle = textSpan.style ?? fallback;
 
+    // 只要用了 strutStyle，显示出来的文字就会靠下一个像素
+    return null;
     return StrutStyle.fromTextStyle(
       textStyle.copyWith(
         height: textStyle.height ?? textStyleConfiguration.lineHeight,
+        fontFamily: 'Segoe UI',
+        fontSize: textStyle.fontSize ?? 16,
       ),
       forceStrutHeight: true,
     );
