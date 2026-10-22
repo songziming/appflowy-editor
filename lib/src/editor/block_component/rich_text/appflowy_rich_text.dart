@@ -157,11 +157,12 @@ class _AppFlowyRichTextState extends State<AppFlowyRichText>
     final textStyle = textSpan.style ?? fallback;
 
     // 只要用了 strutStyle，显示出来的文字就会靠下一个像素
-    return null;
+    // return null;
+    // debugPrint('font size ${textStyle.fontSize}');
+    // debugPrint('line height ${textStyle.height} ${textStyleConfiguration.lineHeight}');
     return StrutStyle.fromTextStyle(
       textStyle.copyWith(
         height: textStyle.height ?? textStyleConfiguration.lineHeight,
-        fontFamily: 'Segoe UI',
         fontSize: textStyle.fontSize ?? 16,
       ),
       forceStrutHeight: true,
@@ -369,7 +370,7 @@ class _AppFlowyRichTextState extends State<AppFlowyRichText>
     final rects = paragraph
         ?.getBoxesForSelection(
           textSelection,
-          boxHeightStyle: BoxHeightStyle.max,
+          boxHeightStyle: BoxHeightStyle.strut,
         )
         .map((box) => box.toRect())
         .toList(growable: false);
@@ -398,6 +399,7 @@ class _AppFlowyRichTextState extends State<AppFlowyRichText>
       ];
     }
 
+    // debugPrint('first sel rect ${rects[0].toString()}');
     return rects;
   }
 
