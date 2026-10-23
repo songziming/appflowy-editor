@@ -6,6 +6,8 @@ typedef BlockComponentTextStyleBuilder = TextStyle Function(
   TextSpan? textSpan,
 });
 
+typedef BlockComponentStrutStyleBuilder = StrutStyle Function(Node node);
+
 /// only for the common config of block component
 class BlockComponentConfiguration {
   const BlockComponentConfiguration({
@@ -17,6 +19,7 @@ class BlockComponentConfiguration {
     this.placeholderTextStyle = _placeholderTextStyle,
     this.blockSelectionAreaMargin = _blockSelectionAreaPadding,
     this.textAlign = _textAlign,
+    this.strutStyle,
   });
 
   /// The padding of a block component.
@@ -39,6 +42,9 @@ class BlockComponentConfiguration {
 
   /// The text style of a block component.
   final BlockComponentTextStyleBuilder textStyle;
+
+  /// 新增字段，AppFlowyRichText 使用这个 strut 固定行高
+  final BlockComponentStrutStyleBuilder? strutStyle;
 
   /// The placeholder text of a block component.
   final String Function(Node node) placeholderText;
@@ -66,6 +72,7 @@ class BlockComponentConfiguration {
     EdgeInsets Function(Node node)? blockSelectionAreaMargin,
     TextAlign Function(Node node)? textAlign,
     EdgeInsets Function(Node node, TextDirection textDirection)? indentPadding,
+    BlockComponentStrutStyleBuilder? strutStyle,
   }) {
     return BlockComponentConfiguration(
       padding: padding ?? this.padding,
@@ -77,6 +84,7 @@ class BlockComponentConfiguration {
           blockSelectionAreaMargin ?? this.blockSelectionAreaMargin,
       textAlign: textAlign ?? this.textAlign,
       indentPadding: indentPadding ?? this.indentPadding,
+      strutStyle: strutStyle ?? this.strutStyle,
     );
   }
 }
@@ -93,6 +101,8 @@ mixin BlockComponentConfigurable<T extends StatefulWidget> on State<T> {
 
   TextStyle placeholderTextStyleWithTextSpan({TextSpan? textSpan}) =>
       configuration.placeholderTextStyle(node, textSpan: textSpan);
+
+  StrutStyle? get strutStyle => configuration.strutStyle?.call(node);
 
   String get placeholderText => configuration.placeholderText(node);
 

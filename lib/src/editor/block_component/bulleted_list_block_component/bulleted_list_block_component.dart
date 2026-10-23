@@ -143,6 +143,7 @@ class _BulletedListBlockComponentWidgetState
               node: widget.node,
               editorState: editorState,
               textAlign: alignment?.toTextAlign ?? textAlign,
+              strutStyle: strutStyle,
               placeholderText: placeholderText,
               textSpanDecorator: (textSpan) => textSpan.updateTextStyle(
                 textStyleWithTextSpan(textSpan: textSpan),

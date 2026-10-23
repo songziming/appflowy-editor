@@ -144,6 +144,7 @@ class _HeadingBlockComponentWidgetState
               node: widget.node,
               editorState: editorState,
               textAlign: alignment?.toTextAlign ?? textAlign,
+              strutStyle: strutStyle,
               textSpanDecorator: (textSpan) {
                 var result = textSpan.updateTextStyle(
                   textStyleWithTextSpan(textSpan: textSpan),

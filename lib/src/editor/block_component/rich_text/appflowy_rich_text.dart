@@ -48,6 +48,7 @@ class AppFlowyRichText extends StatefulWidget {
     this.textSpanOverlayBuilder,
     this.textSpanBackgroundBuilder,
     this.textAlign,
+    this.strutStyle,
     this.cursorColor = const Color.fromARGB(255, 0, 0, 0),
     this.selectionColor = const Color.fromARGB(53, 111, 201, 231),
     this.autoCompleteTextProvider,
@@ -83,6 +84,13 @@ class AppFlowyRichText extends StatefulWidget {
   final AppFlowyTextSpanDecorator? placeholderTextSpanDecorator;
 
   final TextAlign? textAlign;
+
+  /// The strut style used to keep the line height stable.
+  ///
+  /// Block components can provide a style prepared by their
+  /// [BlockComponentConfiguration]. When it is null, the rich text falls
+  /// back to deriving a strut style from the final text span.
+  final StrutStyle? strutStyle;
 
   // get the cursor rect, selection rects or block rect from the delegate
   final SelectableMixin delegate;
@@ -149,7 +157,7 @@ class _AppFlowyRichTextState extends State<AppFlowyRichText>
       widget.editorState.editorStyle.textSpanBackgroundBuilder;
 
   // 固定行高，其他样式保持不变
-  StrutStyle? _createStrutStyle(TextSpan textSpan) {
+  StrutStyle? _fallbackStrutStyle(TextSpan textSpan) {
     final fallback = textStyleConfiguration.text.copyWith(
       height: textStyleConfiguration.lineHeight,
     );
@@ -460,7 +468,7 @@ class _AppFlowyRichTextState extends State<AppFlowyRichText>
             textStyleConfiguration.applyHeightToLastDescent,
         leadingDistribution: textStyleConfiguration.leadingDistribution,
       ),
-      strutStyle: _createStrutStyle(textSpan),
+      strutStyle: widget.strutStyle ?? _fallbackStrutStyle(textSpan),
       text: textSpan,
       textDirection: textDirection(),
       textScaler: TextScaler.linear(
@@ -500,7 +508,7 @@ class _AppFlowyRichTextState extends State<AppFlowyRichText>
             textStyleConfiguration.applyHeightToLastDescent,
         leadingDistribution: textStyleConfiguration.leadingDistribution,
       ),
-      strutStyle: _createStrutStyle(textSpan),
+      strutStyle: widget.strutStyle ?? _fallbackStrutStyle(textSpan),
       text: textSpan,
       textDirection: textDirection(),
       textScaler:
@@ -576,7 +584,7 @@ class _AppFlowyRichTextState extends State<AppFlowyRichText>
                 textStyleConfiguration.applyHeightToLastDescent,
             leadingDistribution: textStyleConfiguration.leadingDistribution,
           ),
-          strutStyle: _createStrutStyle(textSpan),
+          strutStyle: widget.strutStyle ?? _fallbackStrutStyle(textSpan),
           text: textSpan,
           textDirection: textDirection(),
           textScaler:
