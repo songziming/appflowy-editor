@@ -21,6 +21,12 @@ typedef BlockComponentValidate = bool Function(Node node);
 
 abstract class BlockComponentActionState {
   set alwaysShowActions(bool alwaysShowActions);
+
+  /// Whether the mouse pointer is currently hovering over the block.
+  ///
+  /// This is the raw hover state, it is not affected by [forceShowBlockAction]
+  /// (which only forces the block actions to be visible).
+  bool get isHovering;
 }
 
 /// BlockComponentBuilder is used to build a BlockComponentWidget.

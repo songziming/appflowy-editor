@@ -36,11 +36,20 @@ class _BlockComponentActionWrapperState
     implements BlockComponentActionState {
   final showActionsNotifier = ValueNotifier<bool>(false);
 
+  /// 新增状态，记录鼠标悬浮状态
+  /// Unlike [showActionsNotifier], this value is not affected by
+  /// [forceShowBlockAction], so the trailing widget can still be hidden when
+  /// the block actions are forced to be visible.
+  final hoverNotifier = ValueNotifier<bool>(false);
+
   bool isDisposed = false;
 
   bool _alwaysShowActions = false;
 
   bool get alwaysShowActions => _alwaysShowActions;
+
+  @override
+  bool get isHovering => hoverNotifier.value;
 
   @override
   set alwaysShowActions(bool alwaysShowActions) {
@@ -67,6 +76,7 @@ class _BlockComponentActionWrapperState
   void dispose() {
     isDisposed = true;
     showActionsNotifier.dispose();
+    hoverNotifier.dispose();
 
     super.dispose();
   }
@@ -74,8 +84,14 @@ class _BlockComponentActionWrapperState
   @override
   Widget build(BuildContext context) {
     return MouseRegion(
-      onEnter: (_) => showActionsNotifier.value = true,
-      onExit: (_) => showActionsNotifier.value = alwaysShowActions || false,
+      onEnter: (_) {
+        hoverNotifier.value = true;
+        showActionsNotifier.value = true;
+      },
+      onExit: (_) {
+        hoverNotifier.value = false;
+        showActionsNotifier.value = alwaysShowActions || false;
+      },
       hitTestBehavior: HitTestBehavior.opaque,
       opaque: false,
       child: Row(
@@ -91,9 +107,10 @@ class _BlockComponentActionWrapperState
             ),
           ),
           if (widget.actionTrailingBuilder != null)
-            widget.actionTrailingBuilder!(
-              context,
-              this,
+            ValueListenableBuilder<bool>(
+              valueListenable: hoverNotifier,
+              builder: (context, isHovering, child) =>
+                  widget.actionTrailingBuilder!(context, this),
             ),
           Expanded(child: widget.child),
         ],
