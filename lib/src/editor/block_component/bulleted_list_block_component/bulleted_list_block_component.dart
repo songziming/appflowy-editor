@@ -135,6 +135,8 @@ class _BulletedListBlockComponentWidgetState
               : _BulletedListIcon(
                   node: widget.node,
                   textStyle: textStyleWithTextSpan(),
+                  strutStyle: strutStyle,
+                  direction: textDirection,
                 ),
           Flexible(
             child: AppFlowyRichText(
@@ -198,10 +200,17 @@ class _BulletedListIcon extends StatelessWidget {
   const _BulletedListIcon({
     required this.node,
     required this.textStyle,
+    required this.direction,
+    this.strutStyle,
   });
 
   final Node node;
   final TextStyle textStyle;
+  final TextDirection direction;
+
+  /// The same strut style used by the content rich text, so that the bullet
+  /// and the content share the same line height and baseline.
+  final StrutStyle? strutStyle;
 
   static final bulletedListIcons = [
     '●',
@@ -226,18 +235,25 @@ class _BulletedListIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final textScaleFactor =
-        context.read<EditorState>().editorStyle.textScaleFactor;
+    final editorState = context.read<EditorState>();
+    final textStyleConfiguration =
+        editorState.editorStyle.textStyleConfiguration;
+    final textScaleFactor = editorState.editorStyle.textScaleFactor;
+    final bulletTextStyle = textStyleConfiguration.text.combine(textStyle);
 
     return Container(
       constraints:
           const BoxConstraints(minWidth: 26, minHeight: 22) * textScaleFactor,
       padding: const EdgeInsets.only(right: 4.0),
       child: Center(
-        child: Text(
-          icon,
-          style: textStyle,
-          textScaler: TextScaler.linear(0.5 * textScaleFactor),
+        child: RichText(
+          textScaler: TextScaler.linear(textScaleFactor * 0.8),
+          strutStyle: strutStyle,
+          text: TextSpan(
+            text: icon,
+            style: bulletTextStyle,
+          ),
+          textDirection: direction,
         ),
       ),
     );

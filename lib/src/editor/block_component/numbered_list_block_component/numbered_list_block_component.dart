@@ -150,6 +150,7 @@ class _NumberedListBlockComponentWidgetState
               : _NumberedListIcon(
                   node: node,
                   textStyle: textStyleWithTextSpan(),
+                  strutStyle: strutStyle,
                   direction: textDirection,
                 ),
           Flexible(
@@ -215,16 +216,23 @@ class _NumberedListIcon extends StatelessWidget {
     required this.node,
     required this.textStyle,
     required this.direction,
+    this.strutStyle,
   });
 
   final Node node;
   final TextStyle textStyle;
   final TextDirection direction;
 
+  /// The same strut style used by the content rich text, so that the number
+  /// and the content share the same line height and baseline.
+  final StrutStyle? strutStyle;
+
   @override
   Widget build(BuildContext context) {
     final editorState = context.read<EditorState>();
-    final text = editorState.editorStyle.textStyleConfiguration.text;
+    final textStyleConfiguration =
+        editorState.editorStyle.textStyleConfiguration;
+    final text = textStyleConfiguration.text;
     final textScaleFactor = editorState.editorStyle.textScaleFactor;
 
     return Container(
@@ -232,13 +240,17 @@ class _NumberedListIcon extends StatelessWidget {
           const BoxConstraints(minWidth: 26, minHeight: 22) * textScaleFactor,
       padding: const EdgeInsets.only(right: 4.0),
       child: Center(
-        child: Text.rich(
+        child: RichText(
           textScaler: TextScaler.linear(textScaleFactor),
-          textHeightBehavior: const TextHeightBehavior(
-            applyHeightToFirstAscent: false,
-            applyHeightToLastDescent: false,
-          ),
-          TextSpan(
+          // textHeightBehavior: TextHeightBehavior(
+          //   applyHeightToFirstAscent:
+          //       textStyleConfiguration.applyHeightToFirstAscent,
+          //   applyHeightToLastDescent:
+          //       textStyleConfiguration.applyHeightToLastDescent,
+          //   leadingDistribution: textStyleConfiguration.leadingDistribution,
+          // ),
+          strutStyle: strutStyle,
+          text: TextSpan(
             text: node.levelString,
             style: text.combine(textStyle),
           ),

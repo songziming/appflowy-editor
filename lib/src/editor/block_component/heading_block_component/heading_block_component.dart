@@ -218,7 +218,7 @@ class _HeadingBlockComponentWidgetState
 
   TextStyle? defaultTextStyle(int level) {
     final fontSizes = [32.0, 28.0, 24.0, 18.0, 18.0, 18.0];
-    final fontSize = fontSizes.elementAtOrNull(level) ?? 18.0;
+    final fontSize = fontSizes.elementAtOrNull(level - 1) ?? 18.0;
 
     return TextStyle(
       fontSize: fontSize,
