@@ -223,8 +223,7 @@ class _NumberedListIcon extends StatelessWidget {
   final TextStyle textStyle;
   final TextDirection direction;
 
-  /// The same strut style used by the content rich text, so that the number
-  /// and the content share the same line height and baseline.
+  /// 确保样式和正文一致
   final StrutStyle? strutStyle;
 
   @override
@@ -242,13 +241,6 @@ class _NumberedListIcon extends StatelessWidget {
       child: Center(
         child: RichText(
           textScaler: TextScaler.linear(textScaleFactor),
-          // textHeightBehavior: TextHeightBehavior(
-          //   applyHeightToFirstAscent:
-          //       textStyleConfiguration.applyHeightToFirstAscent,
-          //   applyHeightToLastDescent:
-          //       textStyleConfiguration.applyHeightToLastDescent,
-          //   leadingDistribution: textStyleConfiguration.leadingDistribution,
-          // ),
           strutStyle: strutStyle,
           text: TextSpan(
             text: node.levelString,

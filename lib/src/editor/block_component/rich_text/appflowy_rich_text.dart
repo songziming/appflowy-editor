@@ -85,11 +85,7 @@ class AppFlowyRichText extends StatefulWidget {
 
   final TextAlign? textAlign;
 
-  /// The strut style used to keep the line height stable.
-  ///
-  /// Block components can provide a style prepared by their
-  /// [BlockComponentConfiguration]. When it is null, the rich text falls
-  /// back to deriving a strut style from the final text span.
+  /// 用于 windows 平台调节 baseline 位置，让文字显示在中间位置
   final StrutStyle? strutStyle;
 
   // get the cursor rect, selection rects or block rect from the delegate
@@ -155,41 +151,6 @@ class _AppFlowyRichTextState extends State<AppFlowyRichText>
   AppFlowyTextSpanBackgroundBuilder? get textSpanBackgroundBuilder =>
       widget.textSpanBackgroundBuilder ??
       widget.editorState.editorStyle.textSpanBackgroundBuilder;
-
-  // 固定行高，其他样式保持不变
-  StrutStyle? _fallbackStrutStyle(TextSpan textSpan) {
-    final fallback = textStyleConfiguration.text.copyWith(
-      height: textStyleConfiguration.lineHeight,
-    );
-
-    final textStyle = textSpan.style ?? fallback;
-
-    // 只要用了 strutStyle，显示出来的文字就会靠下一个像素
-    // return null;
-    // debugPrint('font size ${textStyle.fontSize}');
-    // debugPrint('line height ${textStyle.height} ${textStyleConfiguration.lineHeight}');
-    return StrutStyle.fromTextStyle(
-      textStyle.copyWith(
-        height: textStyle.height ?? textStyleConfiguration.lineHeight,
-        fontSize: textStyle.fontSize ?? 16,
-      ),
-      forceStrutHeight: true,
-    );
-  }
-
-  // 盘古之白，给中英文之间自动加上空格（如果已经存在空格则不管）
-  // TODO 这里的正则可能未覆盖完整中西文段
-  String _pangusBai(String raw) => raw.replaceAllMapped(
-    RegExp(r'([\u4e00-\u9fa5])([a-zA-Z0-9])|([a-zA-Z0-9])([\u4e00-\u9fa5])'),
-    (match) {
-      // 如果第一组和第二组匹配，说明是中文后跟英文
-      if (match.group(1) != null && match.group(2) != null) {
-        return '${match.group(1)} ${match.group(2)}';
-      }
-      // 如果第三组和第四组匹配，说明是英文后跟中文
-      return '${match.group(3)} ${match.group(4)}';
-    },
-  );
 
   @override
   void initState() {
@@ -468,7 +429,7 @@ class _AppFlowyRichTextState extends State<AppFlowyRichText>
             textStyleConfiguration.applyHeightToLastDescent,
         leadingDistribution: textStyleConfiguration.leadingDistribution,
       ),
-      strutStyle: widget.strutStyle ?? _fallbackStrutStyle(textSpan),
+      strutStyle: widget.strutStyle,
       text: textSpan,
       textDirection: textDirection(),
       textScaler: TextScaler.linear(
@@ -508,7 +469,7 @@ class _AppFlowyRichTextState extends State<AppFlowyRichText>
             textStyleConfiguration.applyHeightToLastDescent,
         leadingDistribution: textStyleConfiguration.leadingDistribution,
       ),
-      strutStyle: widget.strutStyle ?? _fallbackStrutStyle(textSpan),
+      strutStyle: widget.strutStyle,
       text: textSpan,
       textDirection: textDirection(),
       textScaler:
@@ -584,7 +545,7 @@ class _AppFlowyRichTextState extends State<AppFlowyRichText>
                 textStyleConfiguration.applyHeightToLastDescent,
             leadingDistribution: textStyleConfiguration.leadingDistribution,
           ),
-          strutStyle: widget.strutStyle ?? _fallbackStrutStyle(textSpan),
+          strutStyle: widget.strutStyle,
           text: textSpan,
           textDirection: textDirection(),
           textScaler:
